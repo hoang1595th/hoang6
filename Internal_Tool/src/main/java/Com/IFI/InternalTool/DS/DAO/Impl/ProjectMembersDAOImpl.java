@@ -70,7 +70,7 @@ public class ProjectMembersDAOImpl implements ProjectMembersDAO {
 		boolean success = false;
 		Transaction tx = null;
 		tx = session.beginTransaction();
-		String hql = "Delete from ProjectMembers where project_members_id = :project_members_id amd ";
+		String hql = "Delete from ProjectMembers where project_members_id = :project_members_id";
 		Query query = session.createQuery(hql);
 		query.setParameter("project_members_id", projectMemberId);
 		int row = query.executeUpdate();
@@ -114,6 +114,18 @@ public class ProjectMembersDAOImpl implements ProjectMembersDAO {
 		} else {
 			return false;
 		}
+	}
+	
+	
+	@Override
+	public ProjectMembers getProjectMemberById(final long projectMemberId) {
+		Session session = entityManagerFactory.unwrap(SessionFactory.class).openSession();
+		String hql = "from ProjectMembers where project_members_id = :projectMemberId";
+		Query query = session.createQuery(hql);
+		query.setParameter("projectMemberId", projectMemberId);
+		ProjectMembers result = (ProjectMembers) query.uniqueResult();
+		session.close();
+		return result;
 	}
 
 }

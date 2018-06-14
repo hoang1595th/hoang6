@@ -14,7 +14,7 @@ public interface EmployeeDAO {
 	// save employees
 	public Boolean saveEmployee(final Employee employee);
 
-	// delete Employess
+	// xoa nhan vien
 	public Boolean deleteEmployee(final long employee_id);
 
 	// get employeess by ID
@@ -35,6 +35,7 @@ public interface EmployeeDAO {
 	List<Employee> getListEmployeeInProject(long project_id, int page, int pageSize);
 
 	List<Employee> getListEmployeeNotInProject(final long employee_id, long project_id, int page, int pageSize);
+
 
 
 

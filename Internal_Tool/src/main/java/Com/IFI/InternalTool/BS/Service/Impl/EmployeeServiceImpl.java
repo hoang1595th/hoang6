@@ -32,6 +32,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public Boolean deleteEmployee(long employee_id) {
+		//kiem tra nhan vien co allocation khong
+		//kiem tra nhan vien co trong project nao khong
 		return employeeDAO.deleteEmployee(employee_id);
 	}
 
@@ -80,5 +82,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public List<Employee> getListSubEmployee(long employee_id) {
 		return employeeDAO.getListSubEmployees(employee_id);
 	}
+
+	
 
 }

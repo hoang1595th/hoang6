@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -201,7 +202,7 @@ public class ProjectController {
 	}
 
 	// update project
-	@PostMapping("/updateProject")
+	@PutMapping("/updateProject")
 	// @PreAuthorize("hasRole('ROLE_USER')")
 	public @ResponseBody Payload updateProject(@Valid @RequestBody Project project) {
 		logger.info("Update Project... ");
@@ -348,20 +349,18 @@ public class ProjectController {
 		}
 		return message;
 	}
-
+	
 	@DeleteMapping("/RemoveMemberOfProject")
 	// @PreAuthorize("hasRole('ROLE_USER')")
-	public @ResponseBody Payload RemoveMemberOfProject(@CurrentUser UserPrincipal currentUser, @Valid @RequestBody ProjectMembers projectMember) {
+	public @ResponseBody Payload RemoveMemberOfProject(@CurrentUser UserPrincipal currentUser,
+			@RequestParam long projectMemberId) {
+
+		boolean hasUserRole = currentUser.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
 		logger.info("Remove Member in Project... ");
-		boolean hasUserRole = currentUser.getAuthorities().stream()
-				.anyMatch(r -> r.getAuthority().equals("ROLE_EMPLOYEE"));
+
 		try {
-			if (projectService.removeMemberOfProject(currentUser.getId(), projectMember)) {
-				message.setPayLoad("Success", AppConstants.STATUS_OK, AppConstants.SUCCESS_CODE,
-						"Remove  Member in Project Successfull", true);
-			} else {
-				message.setPayLoad("FAILED", AppConstants.STATUS_KO, AppConstants.FAILED_CODE,
-						"ERROR: This Employee had allocated ", false);
+			if (hasUserRole) {
+				data = projectService.removeMemberOfProject(currentUser.getId(), projectMemberId);
 			}
 		} catch (Exception e) {
 			logger.error("ERROR: Get connection error", e);
@@ -369,7 +368,12 @@ public class ProjectController {
 					false);
 			return message;
 		}
-
+		
+		if (data.equals(Boolean.FALSE)) {
+			message.setPayLoad(data, AppConstants.STATUS_KO, AppConstants.SUCCESS_CODE, "The Employee not exist or You don't have permitsion to delete", false);
+		}else {
+			message.setPayLoad(data, AppConstants.STATUS_OK, AppConstants.SUCCESS_CODE, "Remove Member in Project Successfull", true);
+		}
 		return message;
 	}
 }

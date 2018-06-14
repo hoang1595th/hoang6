@@ -39,11 +39,13 @@ public interface ProjectService {
 	
 	// update project
 	boolean updateProject(final Project project);
-
+	
+	//them nhan vien vao project
 	Boolean addMemberToProject(final long currentEmployeeId, final ProjectMembers projectMember);
-	Boolean addListMemberToProject(final long currentEmployeeId, final List<ProjectMembers> listProjectMember);
-
-	Boolean removeMemberOfProject(final long currentEmployeeId,final ProjectMembers projectMember);
+	//Boolean addListMemberToProject(final long currentEmployeeId, final List<ProjectMembers> listProjectMember);
+	
+	//xoa nhan vien khoi project
+	Boolean removeMemberOfProject(final long currentEmployeeId, final long projectMemberId);
 
 	// tim kiem cac project da off
 	List<Project> getListProjectOutOfDate(int page, int pageSize);

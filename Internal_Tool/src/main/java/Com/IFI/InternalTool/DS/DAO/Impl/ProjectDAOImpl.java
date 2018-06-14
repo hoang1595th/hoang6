@@ -70,7 +70,7 @@ public class ProjectDAOImpl implements ProjectDAO {
 		Session session = entityManagerFactory.unwrap(SessionFactory.class).openSession();
 		Transaction tx = null;
 		tx = session.beginTransaction();		
-		// xoa cac project manager
+		// xoa cac project member
 		projectMemberDAOImpl.deleteAllMemberInProject(project_id);
 		String hql = "Delete from Project where project_id=:project_id";
 		Query query = session.createQuery(hql);

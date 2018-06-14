@@ -1,5 +1,7 @@
 package Com.IFI.InternalTool.BS.Service.Impl;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -180,31 +182,44 @@ public class ProjectServiceImpl implements ProjectService {
 			return false;
 		}
 		// kiem tra id nhan vien them vao co thuoc danh sach subEmployee khong
-		if (employeeServiceImpl.getListSubEmployee(currentEmployeeId).contains(subEmployee)) {
-			//da co service lay role id
-			//can sua lai
-			projectMember.setPriority(employeeServiceImpl.getEmployeeById(projectMember.getEmployee_id()).getRole_id());
-			projectMember.setLeader_id(currentEmployeeId);
-			return projectMemberDAO.addMemberToProject(projectMember);
-		} else {
-			return false;
+		for (Employee employee : employeeServiceImpl.getListSubEmployee(currentEmployeeId)) {
+			if (employee.getEmployee_id() == projectMember.getEmployee_id()) {
+				//da co service lay role id
+				//can sua lai
+				projectMember.setPriority(employeeServiceImpl.getEmployeeById(projectMember.getEmployee_id()).getRole_id());
+				projectMember.setLeader_id(currentEmployeeId);
+				return projectMemberDAO.addMemberToProject(projectMember);
+			}
 		}
-	}
-	
-	@Override
-	public Boolean addListMemberToProject(final long currentEmployeeId, final List<ProjectMembers> listProjectMember) {
-		
 		return false;
 	}
-
+	
+	
+	//ai co quyen them thi se co quyen xoa
 	@Override
-	public Boolean removeMemberOfProject(long currentEmployeeId, ProjectMembers projectMember) {
-		// kiem tra nhan vien xoa co phai duoc them boi nhan vien hien tai khong
-		if (projectMember.getLeader_id() == currentEmployeeId) {
-			return projectMemberDAO.removeMemberOfProject(projectMember.getProject_members_id());
-		} else {
+	public Boolean removeMemberOfProject(long currentEmployeeId, long projectMemberId) {
+		//kiem tra nhan vien duoc xoa co ton tai khong
+		Object pm = projectMemberDAO.getProjectMemberById(projectMemberId);
+		if (!(pm instanceof ProjectMembers)) {
 			return false;
 		}
+		ProjectMembers projectMember = (ProjectMembers) pm;		
+		Employee subEmployee = employeeServiceImpl.getEmployeeById(projectMember.getEmployee_id());
+		//neu khong phai nhan vien trong project thi k co quyen xoa
+		if (!projectMemberDAO.isMembersOfProject(currentEmployeeId, projectMember.getProject_id())) {
+			return false;
+		}
+		// kiem tra id nhan vien xoa di co thuoc danh sach subEmployee khong
+		for (Employee employee : employeeServiceImpl.getListSubEmployee(currentEmployeeId)) {
+			if (employee.getEmployee_id() == projectMember.getEmployee_id()) {
+				//da co service lay role id
+				//can sua lai
+				projectMember.setPriority(employeeServiceImpl.getEmployeeById(projectMember.getEmployee_id()).getRole_id());
+				projectMember.setLeader_id(currentEmployeeId);
+				return projectMemberDAO.removeMemberOfProject(projectMember.getProject_members_id());
+			}
+		}
+		return false;
 	}
 
 }

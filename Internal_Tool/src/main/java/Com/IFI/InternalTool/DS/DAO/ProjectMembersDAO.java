@@ -16,5 +16,7 @@ public interface ProjectMembersDAO {
 	
 	//xoa tat ca member cua mot project
 	boolean deleteAllMemberInProject(final long projectId);
+	//lay mot project member theo id
+	ProjectMembers getProjectMemberById(final long projectMemberId);
 	
 }

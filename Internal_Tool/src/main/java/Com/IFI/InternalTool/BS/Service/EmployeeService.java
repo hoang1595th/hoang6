@@ -14,7 +14,7 @@ public interface EmployeeService {
 	// save employess
 	public Boolean saveEmployee(final Employee employee);
 
-	// delete employees by id
+	// xoa nhan vien
 	@PreAuthorize("hasRole('ADMIN')")
 	public Boolean deleteEmployee(final long employee_id);
 
@@ -39,5 +39,8 @@ public interface EmployeeService {
 
 	// lay danh sach nhan vien cap duoi
 	List<Employee> getListSubEmployee(final long employee_id);
+	
+	//lay danh sach project theo nhan vien
+	
 
 }

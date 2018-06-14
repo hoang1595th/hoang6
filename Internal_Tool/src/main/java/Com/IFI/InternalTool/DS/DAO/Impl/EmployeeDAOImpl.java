@@ -71,6 +71,9 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 		Session session = entityManagerFactory.unwrap(SessionFactory.class).openSession();
 		Transaction tx = null;
 		tx = session.beginTransaction();
+		//xoa nhan vien trong project
+		
+		
 		String hql = "Delete from Employee where employee_id=:employee_id";
 		Query query = session.createQuery(hql);
 		query.setParameter("employee_id", employee_id);
@@ -190,6 +193,8 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 		session.close();
 		return list;
 	}
+
+	
 
 	
 
