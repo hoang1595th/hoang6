@@ -14,7 +14,7 @@ public interface ProjectService {
 	List<Project> getAllProject();
 
 	// luu project
-	public void saveProject(long managerId, Project project);
+	public boolean saveProject(long managerId, Project project);
 
 	// xoa project
 	boolean deleteProject(long project_id);

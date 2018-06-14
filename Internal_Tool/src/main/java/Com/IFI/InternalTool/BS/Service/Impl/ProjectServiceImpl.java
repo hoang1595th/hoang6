@@ -44,12 +44,12 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
-	public void saveProject(long managerId, Project project) {
+	public boolean saveProject(long managerId, Project project) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(project.getStart_date());
 		project.setMonth(calendar.MONTH);
 		project.setYear(calendar.YEAR);
-		projectDAO.saveProject(project);
+		boolean success = projectDAO.saveProject(project);
 		//tu dong them manager vao bang
 		ProjectMembers projectMembers = new ProjectMembers();
 		projectMembers.setEmployee_id(managerId);
@@ -58,6 +58,7 @@ public class ProjectServiceImpl implements ProjectService {
 		projectMembers.setPriority(employeeServiceImpl.getEmployeeById(managerId).getRole_id());
 		projectMembers.setProject_id(project.getProject_id());
 		projectMemberDAO.addMemberToProject(projectMembers);
+		return success;
 	}
 
 	@Override

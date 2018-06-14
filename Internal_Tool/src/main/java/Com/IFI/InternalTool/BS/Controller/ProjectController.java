@@ -37,11 +37,13 @@ public class ProjectController {
 	AuthenticationManager authenticationManager;
 	Payload message = new Payload();
 	Object data = "";
+	boolean success = false;
 
 	private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
 	// lay tat ca project
 	@GetMapping
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public @ResponseBody Payload getAllProjects(
 			@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 			@RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize) {
@@ -60,18 +62,28 @@ public class ProjectController {
 	// tao project
 	@PostMapping(value = { "/create" })
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public @ResponseBody Payload createProject(@CurrentUser UserPrincipal currentUser, @Valid @RequestBody Project projectRequest) {
+	public @ResponseBody Payload createProject(@CurrentUser UserPrincipal currentUser, @Valid @RequestBody Project projectRequest,
+			@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+			@RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize) {
 		logger.info("Create Project ... ");
 
 		try {
-			projectService.saveProject(currentUser.getId(), projectRequest);
+			//sua kieu boolean cho update
+			success = projectService.saveProject(currentUser.getId(), projectRequest);
+			data = projectService.getAllProjects(page, pageSize);
 		} catch (Exception e) {
 			logger.error("ERROR: Get connection error", e);
 			message.setPayLoad("Failed", AppConstants.STATUS_KO, AppConstants.FAILED_CODE, "ERROR: " + e.getMessage(),
 					false);
 			return message;
 		}
-		message.setPayLoad(data, AppConstants.STATUS_OK, AppConstants.SUCCESS_CODE, "Create Project Successfull", true);
+		// kiem tra viec thanh cong
+		if (!success) {
+			message.setPayLoad(data, AppConstants.STATUS_KO, AppConstants.SUCCESS_CODE,	"Create Project Doesn't Successfull", false);
+		} else {
+			message.setPayLoad(data, AppConstants.STATUS_OK, AppConstants.SUCCESS_CODE, "Create Project Successfull",
+					true);
+		}
 		return message;
 	}
 
@@ -119,18 +131,22 @@ public class ProjectController {
 	// xoa project
 	@DeleteMapping("/deleteProject")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public @ResponseBody Payload deleteProject(@RequestParam("project_id") long projectId) {
+	public @ResponseBody Payload deleteProject(@RequestParam("project_id") long projectId,
+			@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+			@RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize) {
 		logger.info("Delete Project ... ");
 
 		try {
-			data = projectService.deleteProject(projectId);
+			success = projectService.deleteProject(projectId);
+			data = projectService.getAllProjects(page, pageSize);
 		} catch (Exception e) {
 			logger.error("ERROR: Get connection error", e);
 			message.setPayLoad("Failed", AppConstants.STATUS_KO, AppConstants.FAILED_CODE, "ERROR: " + e.getMessage(),
 					false);
 			return message;
 		}
-		if (data.equals(Boolean.FALSE)) {
+		//kiem tra viec thanh cong
+		if (!success) {
 			message.setPayLoad(data, AppConstants.STATUS_KO, AppConstants.SUCCESS_CODE, "Delete Project Doesn't Successfull", false);
 		}else {
 			message.setPayLoad(data, AppConstants.STATUS_OK, AppConstants.SUCCESS_CODE, "Delete Project Successfull", true);
@@ -203,20 +219,28 @@ public class ProjectController {
 
 	// update project
 	@PutMapping("/updateProject")
-	// @PreAuthorize("hasRole('ROLE_USER')")
-	public @ResponseBody Payload updateProject(@Valid @RequestBody Project project) {
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public @ResponseBody Payload updateProject(@Valid @RequestBody Project project,
+			@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+			@RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize) {
 		logger.info("Update Project... ");
 
 		try {
-			data = projectService.updateProject(project);
+			success = projectService.updateProject(project);
+			data = projectService.getAllProjects(page, pageSize);
 		} catch (Exception e) {
 			logger.error("ERROR: Get connection error", e);
 			message.setPayLoad(data, AppConstants.STATUS_KO, AppConstants.FAILED_CODE, "ERROR: " + e.getMessage(),
 					false);
 			return message;
 		}
-		message.setPayLoad(data, AppConstants.STATUS_OK, AppConstants.SUCCESS_CODE, "Update Projectt Successfull",
-				true);
+		
+		//kiem tra thanh cong
+		if (!success) {
+			message.setPayLoad(data, AppConstants.STATUS_KO, AppConstants.SUCCESS_CODE, "Update Project Doesn't Successfull", false);
+		}else {
+			message.setPayLoad(data, AppConstants.STATUS_OK, AppConstants.SUCCESS_CODE, "Update Project Successfull", true);
+		}
 		return message;
 	}
 
